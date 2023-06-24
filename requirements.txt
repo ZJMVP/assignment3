@@ -57,7 +57,7 @@ nest-asyncio==1.5.4
 numpy==1.21.4
 opencv-python==4.5.4.60
 packaging==21.3
-pandas==1.4.1
+pandas==2.0.2
 pandocfilters==1.5.0
 paramiko==2.10.3
 parso==0.8.3
@@ -108,3 +108,4 @@ whichcraft==0.6.1
 WTForms==3.0.1
 zope.event==4.5.0
 zope.interface==5.5.1
+redis==4.5.5

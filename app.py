@@ -1,15 +1,23 @@
+import os
 from math import radians, sin, cos, asin, sqrt
 from flask import Flask, render_template, request
 import pyodbc
+import redis
+import json
+import pandas
+import ast
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'zjmvp'
 
+azure_cache_connection_string = 'redis://:6us4QDDrYwjlHQHggSr3EVIlSUTzMHG97AzCaMdzvVI=@earthquake-assignment.redis.cache.windows.net:6379'
 driver = '{ODBC Driver 18 for SQL Server}'
 database = 'zj-earth'
 server = 'zj-server.database.windows.net'
 username = "jie_zhao"
 password = "Kd1016686103"
+redis_client = redis.from_url(azure_cache_connection_string)
+redis_client.flushall()
 
 with pyodbc.connect(
         'DRIVER=' + driver + ';SERVER=' + server + ';PORT=1433;DATABASE=' + database + ';UID=' + username + ';PWD=' + password) as conn:
@@ -22,6 +30,15 @@ with pyodbc.connect(
                 break
             print(str(r[0]) + " " + str(r[1]))
             temp.append(r)
+
+
+def convert_row_to_dict(obj):
+    if isinstance(obj, pyodbc.Row):
+        obj_list = []
+        for i in range(22):
+            obj_list.append(obj[i])
+        return obj_list
+    return None
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -47,9 +64,18 @@ def searRange():
         Range2 = str(request.form['Range2'])
         Fromdate = request.form['Fromdate']
         Todate = request.form['Todate']
-        query = "SELECT * FROM dbo.earthquake where (mag BETWEEN '" + Range1 + "' and '" + Range2 + "') and (CAST(time as date) BETWEEN CAST('" + Fromdate + "' as date) and CAST('" + Todate + "' as date)) "
-        cursor.execute(query)
-        results = cursor.fetchall()
+        r_key = 'searchRange_' + Range1 + Range2 + Fromdate + Todate
+        print(r_key)
+        stored_list = redis_client.get(r_key)
+        results = None
+        if stored_list is None or len(stored_list) == 0:
+            query = "SELECT * FROM dbo.earthquake where (mag BETWEEN '" + Range1 + "' and '" + Range2 + "') and (CAST(time as date) BETWEEN CAST('" + Fromdate + "' as date) and CAST('" + Todate + "' as date)) "
+            cursor.execute(query)
+            results = cursor.fetchall()
+            redis_client.set('searchRange_' + Range1 + Range2 + Fromdate + Todate, json.dumps(results, default=convert_row_to_dict))
+        else:
+            results = json.loads(stored_list)
+            print(type(results))
         return render_template("searchRange.html", length=len(results), rows=results)
     else:
         return render_template("searchRange.html")
@@ -117,4 +143,4 @@ def comparison():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=8000)
