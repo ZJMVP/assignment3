@@ -60,6 +60,7 @@ def mag():
             redis_client.set(r_key, json.dumps(results, default=convert_row_to_dict))
         else:
             results = json.loads(stored_list)
+            print(type(results))
         return render_template('showMag.html', rows=results, temp=0, cnt=len(results))
     return render_template('ShowMag.html', temp=1)
 
