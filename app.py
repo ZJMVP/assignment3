@@ -35,7 +35,7 @@ with pyodbc.connect(
 def convert_row_to_dict(obj):
     if isinstance(obj, pyodbc.Row):
         obj_list = []
-        for i in range(23):
+        for i in range(22):
             obj_list.append(obj[i])
         return obj_list
     return None
