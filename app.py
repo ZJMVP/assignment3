@@ -61,7 +61,7 @@ def mag():
         else:
             results = json.loads(stored_list)
             print(type(results))
-        return render_template('showMag.html', rows=results, temp=0, cnt=len(results))
+        return render_template('ShowMag.html', rows=results, temp=0, cnt=len(results))
     return render_template('ShowMag.html', temp=1)
 
 
