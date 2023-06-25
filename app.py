@@ -35,7 +35,7 @@ with pyodbc.connect(
 def convert_row_to_dict(obj):
     if isinstance(obj, pyodbc.Row):
         obj_list = []
-        for i in range(22):
+        for i in range(23):
             obj_list.append(obj[i])
         return obj_list
     return None
@@ -50,9 +50,16 @@ def index():
 def mag():
     if request.method == 'POST':
         mag = request.form["mag"]
-        query = "SELECT * FROM dbo.earthquake where mag >=" + mag
-        cursor.execute(query)
-        results = cursor.fetchall()
+        r_key = 'mag_' + mag
+        stored_list = redis_client.get(r_key)
+        results = None
+        if stored_list is None or len(stored_list) == 0:
+            query = "SELECT * FROM dbo.earthquake where mag >=" + mag
+            cursor.execute(query)
+            results = cursor.fetchall()
+            redis_client.set(r_key, json.dumps(results, default=convert_row_to_dict))
+        else:
+            results = json.loads(stored_list)
         return render_template('showMag.html', rows=results, temp=0, cnt=len(results))
     return render_template('ShowMag.html', temp=1)
 
@@ -65,14 +72,13 @@ def searRange():
         Fromdate = request.form['Fromdate']
         Todate = request.form['Todate']
         r_key = 'searchRange_' + Range1 + Range2 + Fromdate + Todate
-        print(r_key)
         stored_list = redis_client.get(r_key)
         results = None
         if stored_list is None or len(stored_list) == 0:
             query = "SELECT * FROM dbo.earthquake where (mag BETWEEN '" + Range1 + "' and '" + Range2 + "') and (CAST(time as date) BETWEEN CAST('" + Fromdate + "' as date) and CAST('" + Todate + "' as date)) "
             cursor.execute(query)
             results = cursor.fetchall()
-            redis_client.set('searchRange_' + Range1 + Range2 + Fromdate + Todate, json.dumps(results, default=convert_row_to_dict))
+            redis_client.set(r_key, json.dumps(results, default=convert_row_to_dict))
         else:
             results = json.loads(stored_list)
             print(type(results))
