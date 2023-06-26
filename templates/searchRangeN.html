@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
@@ -19,6 +18,10 @@
             width: 2.5rem;
             line-height: 40px;
             margin-left: 20px;
+        }
+
+        .form-con {
+            margin-top: 20px;
         }
 
         .container {
@@ -57,28 +60,45 @@
         }
     </style>
 </head>
-
 <body>
+
 <div class="navigation-bar">
     <a href="/">Home</a>
 </div>
-<br/><br/>
+<div class="form-con">
+    <form action="/searchRangeN" method="POST">
+        Lower bound: <input type="text" placeholder="lower bound" name="Range1" value="{{ Range1 }}"> <br/>
+        Upper bound:<input type="text" placeholder="upper bound" name="Range2" value="{{ Range2 }}"><br/>
+        N:<input type="text" placeholder="city number" name="Num" value="{{ Num }}"><br/>
+        <input type="submit" value="Submit">
+    </form>
+</div>
+<div>This query takes {{ tims }} ms</div>
 <div class="container">
     <div class="table-con">
-        <table id='customers'>
+        {% if length %}
+            <table id='customers'>
             <tr>
-                <th>Magnitude</th>
-                <th>Count</th>
+                <td>City</td>
+                <td>State</td>
+                <td>Population</td>
+                <td>Latitude</td>
+                <td>Longitude</td>
             </tr>
+
             {% for col in rows %}
                 <tr>
                     <td>{{ col[0] }}</td>
                     <td>{{ col[1] }}</td>
+                    <td>{{ col[2] }}</td>
+                    <td>{{ col[3] }}</td>
+                    <td>{{ col[4] }}</td>
                 </tr>
+
             {% endfor %}
+        {% endif %}
         </table>
     </div>
 </div>
 </body>
-
 </html>
