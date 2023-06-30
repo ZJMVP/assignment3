@@ -16,7 +16,7 @@ def showPie():
 
 @app.route('/showBar', methods=['GET', 'POST'])
 def showBar():
-    return render_template('ShowBar.html')
+    return render_template('showBar.html')
 
 
 if __name__ == '__main__':
