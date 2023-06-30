@@ -19,5 +19,10 @@ def showBar():
     return render_template('showBar.html')
 
 
+@app.route('/showScatter', methods=['GET', 'POST'])
+def showScatter():
+    return render_template('showScatter.html')
+
+
 if __name__ == '__main__':
     app.run(port=8000)
