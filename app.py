@@ -146,7 +146,47 @@ def comparison():
     winner = "Night"
     if earthDayCount > (earthCount - earthDayCount):
         winner = "Day"
-    return render_template("Comparison.html", dayCount=earthDayCount, nightCount=earthCount - earthDayCount, winner=winner)
+    return render_template("Comparison.html", dayCount=earthDayCount, nightCount=earthCount - earthDayCount,
+                           winner=winner)
+
+
+@app.route('/assignment4', methods=['POST', 'GET'])
+def assignment4_root():
+    return render_template("assignment4/index.html")
+
+
+@app.route('/assignment4/numberEarthquakes', methods=['POST', 'GET'])
+def assignment4_number_earthquakes():
+    query = "SELECT id, mag FROM dbo.earthquake"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    nums = [0, 0, 0, 0]
+    for row in rows:
+        if row[1] is None:
+            continue
+        magnitude = float(row[1])
+        if magnitude < 1:
+            nums[0] += 1
+        elif magnitude < 2:
+            nums[1] += 1
+        elif magnitude < 3:
+            nums[2] += 1
+        else:
+            nums[3] += 1
+    return render_template("assignment4/numberEarthquakes.html", nums=nums)
+
+
+@app.route('/assignment4/magnitudeDepth', methods=['POST', 'GET'])
+def assignment4_magnitude_depth():
+    query = "SELECT top 100 depth, mag FROM dbo.earthquake order by time desc"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    nums = []
+    for row in rows:
+        if row[0] is not None and row[1] is not None:
+            nums.append([row[0], row[1]])
+    print(len(nums))
+    return render_template("assignment4/magnitudeDepth.html", nums=nums)
 
 
 if __name__ == '__main__':
