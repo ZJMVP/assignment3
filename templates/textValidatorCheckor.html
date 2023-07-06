@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Validity Checker</title>
+    <style>
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<h1>Text Validity Checker</h1>
+
+<form onsubmit="validateText(); return false;">
+    <label for="text">Enter Text:</label><br>
+    <textarea id="text" rows="10" cols="50"></textarea><br>
+    <label for="minWordsInput">Minimum number of words per sentence (M):</label>
+    <input type="number" id="M" min="1"><br><br>
+
+    <label for="maxWordsInput">Maximum number of words per sentence (X):</label>
+    <input type="number" id="X" min="1"><br><br>
+
+    <label for="maxPartWordsInput">Maximum number of words per part in long sentences (P):</label>
+    <input type="number" id="P" min="1"><br><br>
+
+    <label for="maxWordLengthInput">Maximum word length (L):</label>
+    <input type="number" id="L" min="1"><br><br>
+    <button type="submit">Validate</button>
+</form>
+
+<div id="validationResult"></div>
+
+<script>
+    function validateText() {
+        var text = document.getElementById('text').value;
+        var M = parseInt(document.getElementById('M').value);
+        var X = parseInt(document.getElementById('X').value);
+        var P = parseInt(document.getElementById('P').value);
+        var L = parseInt(document.getElementById('L').value);
+
+        var sentences = text.split(/[?!\.]\s+/); // Split text into sentences
+        alert(sentences[0])
+        var isValid = true;
+        var errors = [];
+
+        sentences.forEach(function (sentence) {
+            var wordCount = sentence.split(/\s+/).length;
+
+            if (wordCount < M || wordCount > X) {
+                errors.push('Sentence "' + sentence + '" fails word count requirement.');
+                isValid = false;
+            } else if (!/^[A-Z]/.test(sentence)) {
+                errors.push('Sentence "' + sentence + '" fails capitalization or punctuation requirement.');
+                isValid = false;
+            } else if (sentence.length > P) {
+                var parts = sentence.split(',');
+                parts.forEach(function (part) {
+                    var partWordCount = part.trim().split(/\s+/).length;
+                    if (partWordCount > P) {
+                        errors.push('Sentence "' + sentence + '" contains a part exceeding the word count limit.');
+                        isValid = false;
+                    }
+                });
+            }
+
+            sentence.split(/\s+/).forEach(function (word) {
+                if (word.length > L) {
+                    errors.push('Word "' + word + '" exceeds character length limit.');
+                    isValid = false;
+                }
+            });
+        });
+
+        var resultDiv = document.getElementById('validationResult');
+        if (isValid) {
+            resultDiv.innerText = 'Valid';
+            resultDiv.className = '';
+        } else {
+            resultDiv.innerHTML = '<p class="error">Invalid:</p><ul><li>' + errors.join('</li><li>') + '</li></ul>';
+            resultDiv.className = 'error';
+        }
+    }
+</script>
+</body>
+</html>
