@@ -1,11 +1,5 @@
-import os
-from math import radians, sin, cos, asin, sqrt
+
 from flask import Flask, render_template, request
-import pyodbc
-import redis
-import json
-import pandas
-import ast
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'zjmvp'
