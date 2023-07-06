@@ -1,18 +1,8 @@
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'zjmvp'
-
-
-def convert_row_to_dict(obj):
-    if isinstance(obj, pyodbc.Row):
-        obj_list = []
-        for i in range(22):
-            obj_list.append(obj[i])
-        return obj_list
-    return None
-
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
